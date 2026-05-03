@@ -7,11 +7,51 @@ logger = logging.getLogger(__name__)
 
 
 TOOLS_SPEC = [
-    {"name": "create_post", "description": "Create a content draft", "input_schema": {"type": "object", "properties": {"topic": {"type": "string"}}, "required": ["topic"]}},
-    {"name": "edit_image", "description": "Edit image: crop/remove bg/add text", "input_schema": {"type": "object", "properties": {"input_path": {"type": "string"}, "overlay_text": {"type": "string"}}, "required": ["input_path"]}},
-    {"name": "generate_images", "description": "Generate images by prompt", "input_schema": {"type": "object", "properties": {"prompt": {"type": "string"}, "count": {"type": "integer"}}, "required": ["prompt"]}},
-    {"name": "add_subtitles_to_video", "description": "Add subtitles to video", "input_schema": {"type": "object", "properties": {"input_path": {"type": "string"}, "subtitle_text": {"type": "string"}}, "required": ["input_path", "subtitle_text"]}},
-    {"name": "schedule_reminder", "description": "Schedule reminder by cron", "input_schema": {"type": "object", "properties": {"cron_expr": {"type": "string"}, "description": {"type": "string"}}, "required": ["cron_expr", "description"]}},
+    {
+        "name": "create_post",
+        "description": "Create a content draft",
+        "input_schema": {
+            "type": "object",
+            "properties": {"topic": {"type": "string"}},
+            "required": ["topic"],
+        },
+    },
+    {
+        "name": "edit_image",
+        "description": "Edit image: crop/remove bg/add text",
+        "input_schema": {
+            "type": "object",
+            "properties": {"input_path": {"type": "string"}, "overlay_text": {"type": "string"}},
+            "required": ["input_path"],
+        },
+    },
+    {
+        "name": "generate_images",
+        "description": "Generate images by prompt",
+        "input_schema": {
+            "type": "object",
+            "properties": {"prompt": {"type": "string"}, "count": {"type": "integer"}},
+            "required": ["prompt"],
+        },
+    },
+    {
+        "name": "add_subtitles_to_video",
+        "description": "Add subtitles to video",
+        "input_schema": {
+            "type": "object",
+            "properties": {"input_path": {"type": "string"}, "subtitle_text": {"type": "string"}},
+            "required": ["input_path", "subtitle_text"],
+        },
+    },
+    {
+        "name": "schedule_reminder",
+        "description": "Schedule reminder by cron",
+        "input_schema": {
+            "type": "object",
+            "properties": {"cron_expr": {"type": "string"}, "description": {"type": "string"}},
+            "required": ["cron_expr", "description"],
+        },
+    },
 ]
 
 
@@ -24,7 +64,7 @@ class ClaudeAgent:
     async def run(self, user_text: str) -> dict:
         logger.info("Sending request to Claude for internal_user_id=%s", self.user_id)
         response = await self.client.messages.create(
-            model="claude-3-5-sonnet-latest",
+            model="claude-haiku-4-5-20251001",
             max_tokens=800,
             system="Ты AI контент-менеджер. Вызывай tools для выполнения действий.",
             messages=[{"role": "user", "content": user_text}],
@@ -45,4 +85,7 @@ class ClaudeAgent:
                 results.append({"tool": tool_name, "result": tool_result})
 
         logger.info("Claude flow finished with %s tool calls", len(results))
-        return {"tools_called": results, "raw": json.dumps([r for r in results], ensure_ascii=False)}
+        return {
+            "tools_called": results,
+            "raw": json.dumps([r for r in results], ensure_ascii=False),
+        }
